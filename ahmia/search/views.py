@@ -6,6 +6,7 @@ import math
 import time
 from datetime import date, datetime
 
+from django.views.generic.base import RedirectView
 from ahmia.views import ElasticsearchBaseListView
 from ahmia import utils
 
@@ -167,3 +168,18 @@ class IipResultsView(TorResultsView):
         context = super(IipResultsView, self).get_es_context(**kwargs)
         context['doc_type'] = "i2p"
         return context
+
+
+class OnionRedirectView(RedirectView):
+    """Build and return redirect page."""
+    permanent = False
+    query_string = False
+    pattern_name = '' #LAE - not sure what this should be
+
+    def get_redirect_url(self, *args, **kwargs):
+        #LAE - figure out how to write to ES here
+        content = Context({'message': message, 'time': time, 'redirect': url})
+        article = get_object_or_404(Article, pk=kwargs['pk'])
+        article.update_counter()
+        return super(OnionRedirectView, self).get_redirect_url(*args, **kwargs)
+
